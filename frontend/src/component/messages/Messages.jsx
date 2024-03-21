@@ -1,0 +1,38 @@
+import React, { useEffect, useRef } from 'react';
+import Message from './Message';
+import useGetMessages from '../../hooks/useGetMessages';
+import MessageSkeleton from '../skeltons/MessageSkeltons';
+import useListenMessages from '../../hooks/useListenMessages';
+
+const Messages = () => {
+   const { messages, loading } = useGetMessages();
+      useListenMessages();
+   const lastMessageRef = useRef();
+
+   useEffect( () => {
+      setTimeout( () => {
+           lastMessageRef.current?.scrollIntoView({ behavior : "smooth" })
+      },100);
+   },[messages]);
+
+   return (
+      <div className="px-4 flex-1 overflow-auto">
+         {/* Check if loading is true */}
+         {loading && [...Array(3)].map((_, idx) => <MessageSkeleton key={idx} />)}
+        
+         {/* Check if messages are available and not loading */}
+         {!loading && messages.length > 0 && messages.map((message) => (
+            <div key={message._id} ref={lastMessageRef}>
+                  <Message message={message} />
+            </div>
+         ))}
+
+         {/* Check if not loading and messages array is empty */}
+         {!loading && messages.length === 0 && (
+            <p className="text-center text-gray-50">Send a message to start the conversation</p>
+         )}
+      </div>
+   );
+};
+
+export default Messages;
